@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>Stone vs Stick</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body data-theme="forest">
+
+<div id="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-wrap">
+      <div class="logo-emblem">⚙</div>
+      <h1>Stone <em>vs</em> Stick</h1>
+    </div>
+    <div class="header-right">
+      <div class="theme-bar">
+        <button class="theme-btn active" data-theme="forest" title="Forest">
+          <span class="theme-icon">🌿</span>
+          <span class="theme-label">Forest</span>
+        </button>
+        <button class="theme-btn" data-theme="mountain" title="Mountain">
+          <span class="theme-icon">🏔</span>
+          <span class="theme-label">Mountain</span>
+        </button>
+        <button class="theme-btn" data-theme="water" title="Water">
+          <span class="theme-icon">🌊</span>
+          <span class="theme-label">Water</span>
+        </button>
+        <button class="theme-btn" data-theme="fire" title="Fire">
+          <span class="theme-icon">🔥</span>
+          <span class="theme-label">Fire</span>
+        </button>
+      </div>
+      <button id="btn-help" class="help-btn" title="How to play">i</button>
+    </div>
+  </header>
+
+  <!-- MATCH PROGRESS -->
+  <div class="match-bar">
+    <span class="match-label">FIRST TO 5 WINS THE MATCH</span>
+    <div class="pip-row" id="pip-stone">
+      <span class="pip-label">🪨</span>
+      <div class="pips" id="pips-stone"></div>
+    </div>
+    <div class="pip-row" id="pip-stick">
+      <span class="pip-label">🪵</span>
+      <div class="pips" id="pips-stick"></div>
+    </div>
+  </div>
+
+  <!-- SCOREBOARD -->
+  <div class="scoreboard">
+    <div class="score-card" id="score-p1">
+      <div class="piece-preview stone-preview"></div>
+      <div class="score-info">
+        <span class="player-label">STONE</span>
+        <span class="score-num" id="score-stone">0</span>
+      </div>
+    </div>
+    <div class="score-vs">VS</div>
+    <div class="score-card" id="score-p2">
+      <div class="piece-preview stick-preview"></div>
+      <div class="score-info">
+        <span class="player-label">STICK</span>
+        <span class="score-num" id="score-stick">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATUS -->
+  <div class="status-bar">
+    <div id="status-msg" class="status-msg">Press Toss Coin to begin!</div>
+    <div id="phase-badge" class="phase-badge hidden">PLACEMENT</div>
+  </div>
+
+  <!-- BOARD -->
+  <div class="board-outer" id="board-outer">
+    <div class="board-frame" id="board-frame">
+      <div class="board-wrapper" id="board-wrapper">
+        <canvas id="board-canvas"></canvas>
+        <div id="pieces-layer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="controls">
+    <button id="btn-toss" class="btn btn-primary">🪙 Toss Coin</button>
+    <button id="btn-ai" class="btn btn-secondary">🤖 AI: OFF</button>
+    <button id="btn-reset" class="btn btn-ghost">↺ New Match</button>
+  </div>
+
+</div><!-- /#app -->
+
+<!-- COIN TOSS OVERLAY -->
+<div id="coin-overlay" class="overlay hidden">
+  <div class="overlay-box coin-box">
+    <h3 class="overlay-title">Coin Toss!</h3>
+    <div id="coin-scene">
+      <div id="coin" class="coin">
+        <div class="coin-f front">
+          <div class="coin-inner">
+            <span id="coin-front-icon" class="coin-emoji">🪨</span>
+            <span id="coin-front-label" class="coin-label">STONE</span>
+          </div>
+        </div>
+        <div class="coin-f back">
+          <div class="coin-inner">
+            <span id="coin-back-icon" class="coin-emoji">🪵</span>
+            <span id="coin-back-label" class="coin-label">STICK</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="toss-result" class="toss-result hidden"></div>
+  </div>
+</div>
+
+<!-- HELP OVERLAY -->
+<div id="help-overlay" class="overlay hidden">
+  <div class="overlay-box help-box">
+    <button id="btn-help-close" class="help-close">✕</button>
+    <h3 class="overlay-title">📖 How To Play</h3>
+    <div class="help-scroll">
+
+      <div class="help-section">
+        <div class="help-section-title">🎯 Objective</div>
+        <p>Align your 3 pieces in a straight line — horizontal, vertical, or diagonal. First player to win <strong>5 rounds</strong> wins the match!</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">🪙 Starting the Game</div>
+        <p>Tap <strong>Toss Coin</strong> to flip. The winner of the toss goes first. The winner of each round starts the next round.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">🎮 Two Phases</div>
+        <div class="help-phase">
+          <span class="phase-tag placement-tag">PLACEMENT</span>
+          <p>Take turns placing your pieces on any empty node until all 6 pieces are on the board (3 each). If you complete a line during placement — you win that round instantly!</p>
+        </div>
+        <div class="help-phase">
+          <span class="phase-tag movement-tag">MOVEMENT</span>
+          <p>Once all pieces are placed, drag your piece to any adjacent connected node along the lines. You cannot jump over other pieces.</p>
+        </div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">🏆 Win Patterns</div>
+        <div class="win-patterns">
+          <div class="win-pattern">
+            <div class="wp-grid horizontal">
+              <span>●</span><span>●</span><span>●</span>
+            </div>
+            <span class="wp-label">Horizontal</span>
+          </div>
+          <div class="win-pattern">
+            <div class="wp-grid vertical">
+              <span>●</span><span>○</span><span>○</span>
+              <span>●</span><span>○</span><span>○</span>
+              <span>●</span><span>○</span><span>○</span>
+            </div>
+            <span class="wp-label">Vertical</span>
+          </div>
+          <div class="win-pattern">
+            <div class="wp-grid diagonal">
+              <span>●</span><span>○</span><span>○</span>
+              <span>○</span><span>●</span><span>○</span>
+              <span>○</span><span>○</span><span>●</span>
+            </div>
+            <span class="wp-label">Diagonal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">📜 Movement Rules</div>
+        <ul class="help-list">
+          <li>Move only one piece per turn</li>
+          <li>Pieces move along grid lines only</li>
+          <li>No diagonal movement on the board</li>
+          <li>Cannot jump over other pieces</li>
+          <li>Cannot move to an occupied node</li>
+        </ul>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">🤖 AI Mode</div>
+        <p>Toggle <strong>AI: ON</strong> to play against the computer. AI plays as Stick and will try to win or block you.</p>
+      </div>
+
+      <div class="help-section">
+        <div class="help-section-title">🎨 Themes</div>
+        <p>Choose <strong>Forest, Mountain, Water</strong> or <strong>Fire</strong> to change the board's visual style.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- WIN OVERLAY -->
+<div id="win-overlay" class="overlay hidden">
+  <div class="overlay-box win-box">
+    <div class="win-sparkle" id="win-sparkle">✨</div>
+    <div class="win-piece-icon" id="win-piece-icon"></div>
+    <h2 id="win-title">Stone Wins!</h2>
+    <p id="win-sub">Round complete</p>
+    <button id="btn-next" class="btn btn-primary">Next Round →</button>
+  </div>
+</div>
+
+<!-- MATCH WIN OVERLAY -->
+<div id="match-overlay" class="overlay hidden">
+  <div class="overlay-box match-box">
+    <div class="trophy">🏆</div>
+    <h2 id="match-title">Stone wins the Match!</h2>
+    <p id="match-sub">5 rounds won — Champion!</p>
+    <button id="btn-new-match" class="btn btn-primary">New Match</button>
+  </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
